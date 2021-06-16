@@ -50,7 +50,7 @@ def enumerate_filters():
     if _filters is None:
         filters = set()
         for m in _find_modules():
-            for (name, obj) in vars(m).items():
+            for (name, obj) in list(vars(m).items()):
                 if hasattr(obj, 'mork_filter_order') and \
                    obj.mork_filter_order >= 0:
                     filters.add(obj)

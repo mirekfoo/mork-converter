@@ -30,7 +30,7 @@ class MorkDict(dict):
 
         # I'm not really sure this initialization is right. It seems
         # unnecessary in test files, but should also be harmless.
-        for i in xrange(0x80):
+        for i in range(0x80):
             col = '%X' % i
             value = chr(i)
             self[col] = value
@@ -155,7 +155,7 @@ class MorkMetaTable(object):
     def column_names(self):
         columns = set(self.cells.keys())
         for (ns, rowid, row) in self.rows:
-            columns.update(row.keys())
+            columns.update(list(row.keys()))
 
         return columns
 
@@ -190,7 +190,7 @@ class MorkRow(dict):
         dict.__init__(self)
 
     def column_names(self):
-        return self.keys()
+        return list(self.keys())
 
     @staticmethod
     def from_ast(ast, db, default_namespace=None):
@@ -315,7 +315,7 @@ class MorkDatabase(object):
                 row_id_ast = row.rowid
                 MorkRow.from_ast(row, self, table_namespace)
             else:
-                raise StandardError('Bad row type: %s' % type(row))
+                raise Exception('Bad row type: %s' % type(row))
 
             (rowid, row_namespace) = self._dissectId(row_id_ast, table_namespace)
 

@@ -52,7 +52,7 @@ class CsvOutput(Filter):
         else:
             writer = _MultiFileWriter(opts, name)
 
-        for (namespace, oid, table) in db.tables.items():
+        for (namespace, oid, table) in list(db.tables.items()):
             writer.write_table(table, namespace, oid)
             meta = db.meta_tables.get((namespace, oid))
             if meta is not None:
@@ -90,7 +90,7 @@ class _TableWriter(object):
             # prepending the row namespace and id.
             values = [row.get(header, '') for header in headers]
             values = [row_namespace, rowid] + values
-            print >> f, self._format_csv_row(values)
+            print(self._format_csv_row(values), file=f)
 
     def write_table(self, table, namespace, oid):
         import MorkDB.morkdb as morkdb
@@ -104,7 +104,7 @@ class _TableWriter(object):
         # the headers, then prepending headers for namespace and id:
         headers = list(table.column_names())
         headers.sort()
-        print >> f, self._format_csv_row(['namespace', 'id'] + headers)
+        print(self._format_csv_row(['namespace', 'id'] + headers), file=f)
 
         self._write_rows(f, table, headers)
 
@@ -135,11 +135,11 @@ class _TableWriter(object):
         # Header line
         headers = list(metatable.column_names())
         headers.sort()
-        print >> f, self._format_csv_row(extra_headers + headers)
+        print(self._format_csv_row(extra_headers + headers), file=f)
 
         # Output cells
         values = [metatable.cells.get(header, '') for header in headers]
-        print >> f, self._format_csv_row(extra_values + values)
+        print(self._format_csv_row(extra_values + values), file=f)
 
         # Output rows
         self._write_rows(f, metatable.rows, headers)
@@ -184,9 +184,9 @@ class _SingleFileWriter(_TableWriter):
         self.fp = self.open(outname)
 
     def _new_table(self, namespace, oid, prefix=''):
-        print >> self.fp, '-' * 70
-        print >> self.fp, '%sTABLE %s :: %s' % (prefix, namespace, oid)
-        print >> self.fp, '-' * 70
+        print('-' * 70, file=self.fp)
+        print('%sTABLE %s :: %s' % (prefix, namespace, oid), file=self.fp)
+        print('-' * 70, file=self.fp)
         return self.fp
 
     def _new_metatable(self, namespace, oid):

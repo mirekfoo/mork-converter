@@ -74,19 +74,19 @@ class XmlOutput(Filter):
         self._output(db, f)
 
     def _output(self, db, f):
-        print >> f, '<?xml version="1.0"?>'
-        print >> f, '<morkxml>'
+        print('<?xml version="1.0"?>', file=f)
+        print('<morkxml>', file=f)
 
-        for (namespace, oid, table) in db.tables.items():
+        for (namespace, oid, table) in list(db.tables.items()):
             meta = db.meta_tables.get((namespace, oid))
             self._write_table(f, namespace, oid, table, meta)
 
-        print >> f, '</morkxml>'
+        print('</morkxml>', file=f)
 
     def _write_table(self, f, namespace, oid, table, meta=None, indent=1):
         indent_str = self._indent_str * indent
-        print >> f, '%s<table namespace=%s id=%s>' % (indent_str,
-            self._format_attribute(namespace), self._format_attribute(oid))
+        print('%s<table namespace=%s id=%s>' % (indent_str,
+            self._format_attribute(namespace), self._format_attribute(oid)), file=f)
 
         for (row_namespace, row_id, row) in table:
             self._write_row(f, row_namespace, row_id, row, indent + 1)
@@ -94,51 +94,51 @@ class XmlOutput(Filter):
         if meta is not None:
             self._write_meta_table(f, meta, indent + 1)
 
-        print >> f, '%s</table>' % indent_str
+        print('%s</table>' % indent_str, file=f)
 
     def _write_meta_table(self, f, meta, indent):
         indent_str = self._indent_str * indent
-        print >> f, '%s<metatable>' % indent_str
+        print('%s<metatable>' % indent_str, file=f)
 
-        for (column, value) in meta.cells.items():
+        for (column, value) in list(meta.cells.items()):
             self._write_cell(f, column, value, indent + 1)
 
         for (namespace, oid, row) in meta.rows:
             self._write_row(f, namespace, oid, row, indent + 1)
 
-        print >> f, '%s</metatable>' % indent_str
+        print('%s</metatable>' % indent_str, file=f)
 
     def _write_row(self, f, namespace, oid, row, indent):
         indent_str = self._indent_str * indent
-        print >> f, '%s<row namespace=%s id=%s>' % (indent_str,
-            self._format_attribute(namespace), self._format_attribute(oid))
+        print('%s<row namespace=%s id=%s>' % (indent_str,
+            self._format_attribute(namespace), self._format_attribute(oid)), file=f)
 
-        for (column, value) in row.items():
+        for (column, value) in list(row.items()):
             self._write_cell(f, column, value, indent + 1)
 
-        print >> f, '%s</row>' % indent_str
+        print('%s</row>' % indent_str, file=f)
 
     def _write_cell(self, f, column, value, indent):
         indent_str = self._indent_str * indent
-        print >> f, '%s<cell column=%s>%s</cell>' % (indent_str,
-            self._format_attribute(column), self._format_element_text(value))
+        print('%s<cell column=%s>%s</cell>' % (indent_str,
+            self._format_attribute(column), self._format_element_text(value)), file=f)
 
     # Regex for stuff that's not in the 'Char' production of the XML grammar
     _non_char = (
-        u'['
-        u'\x00-\x08\x0B\x0C\x0E-\x1F'  # Control characters
-        u'\uD800-\uDFFF'               # Surrogates
-        u'\uFFFE\uFFFF'                # Permanently unassigned (BOM)
-        u']'
+        '['
+        '\x00-\x08\x0B\x0C\x0E-\x1F'  # Control characters
+        '\uD800-\uDFFF'               # Surrogates
+        '\uFFFE\uFFFF'                # Permanently unassigned (BOM)
+        ']'
     )
 
     # Regex for stuff that's not in the 'AttValue' production in the XML
     # grammar. '>' is also included for symmetry.
-    _non_att_value_matcher = re.compile(_non_char + u'|[<>&"]')
+    _non_att_value_matcher = re.compile(_non_char + '|[<>&"]')
 
     # Regex for stuff that's not in the 'CharData' production in the XML
     # grammar. '>' is also included for symmetry.
-    _non_char_data_matcher = re.compile(_non_char + u'|[<>&]')
+    _non_char_data_matcher = re.compile(_non_char + '|[<>&]')
     # For reference, the version without '>' requires including ']]>':
     #_non_char_data_matcher = re.compile(_non_char + u'|[<&]|]]>')
 

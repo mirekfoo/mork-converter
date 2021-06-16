@@ -33,8 +33,8 @@ class StripEmptyCells(Filter):
         if not opts.strip_empty:
             return
 
-        for (row_namespace, row_id, row) in db.rows.items():
-            for (col, val) in row.items():
+        for (row_namespace, row_id, row) in list(db.rows.items()):
+            for (col, val) in list(row.items()):
                 if not val:
                     del row[col]
 

@@ -64,12 +64,12 @@ class Int(FieldConverter):
         if field.opts.no_base:
             return field.value
 
-        return unicode(self._to_int(field.value))
+        return str(self._to_int(field.value))
 
     def _to_int(self, value):
         try:
             return int(value, self.base)
-        except ValueError, e:
+        except ValueError as e:
             raise ConversionError(str(e))
 
 class IntHex(Int):
@@ -93,7 +93,7 @@ class SignedInt32(Int):
         if ival > 0x7fffffff:
             ival -= 0x100000000
 
-        return unicode(ival)
+        return str(ival)
 
 # From TB3.0.5:mailnews/imap/src/nsImapMailFolder.cpp, with constants in
 # mailnews/imap/src/nsImapCore.h
@@ -109,7 +109,7 @@ class HierDelim(Int):
         ival = self._to_int(field.value)
         try:
             cval = chr(ival)
-        except ValueError, e:
+        except ValueError as e:
             raise ConversionError(str(e))
         if cval == '^':
             return 'kOnlineHierarchySeparatorUnknown'
@@ -425,7 +425,7 @@ class Seconds(Time):
             seconds = as_int / self.divisor
             return time.localtime(seconds)
         # This should catch errors from int() and localtime()
-        except ValueError, e:
+        except ValueError as e:
             raise ConversionError(str(e))
 
 
@@ -436,7 +436,7 @@ class FormattedTime(Time):
     def _to_time(self, field):
         try:
             return time.strptime(field.value, self.parse_format)
-        except ValueError, e:
+        except ValueError as e:
             raise ConversionError(str(e))
 
 class SecondsHex(Seconds):
@@ -464,11 +464,11 @@ class SecondsGuessBase(Seconds):
             seconds = int(field.value, base)
             return time.localtime(seconds)
         # This should catch errors from int() and localtime()
-        except ValueError, e:
+        except ValueError as e:
             raise ConversionError(str(e))
 
     def _search_for_base(self, field):
-        for (row_ns, row_id, row) in field.db.rows.items():
+        for (row_ns, row_id, row) in list(field.db.rows.items()):
             val = row.get(field.column)
             if val and self._hex_matcher.search(val):
                 base = 16
@@ -476,7 +476,7 @@ class SecondsGuessBase(Seconds):
         else:
             try:
                 as_dec = int(field.value)
-            except ValueError, e:
+            except ValueError as e:
                 raise ConversionError(str(e))
 
             warnings.warn("uncertain number base; consider using --convert "

@@ -82,7 +82,7 @@ class FieldInfo(object):
         le_count = 0
         # Check each row and column, testing for likely byte order
         for (row_namespace, row_id, row) in table:
-            for (column, value) in row.items():
+            for (column, value) in list(row.items()):
                 if (row_namespace, column) not in _known_utf16:
                     # Not a UTF-16 field
                     continue
@@ -152,7 +152,7 @@ def _decode_known_utf16(field):
 
     return field.value.decode(codec)
 
-_control_matcher = re.compile(ur'[\x80-\x9f]')
+_control_matcher = re.compile(r'[\x80-\x9f]')
 def _decode_iso_8859(field):
     '''
     Decoder that uses one of the ISO-8859 encodings, and fails if the result
@@ -209,7 +209,7 @@ class DecodeCharacters(Filter):
                             force_encoding=[])
 
     def process(self, db, opts):
-        for (table_namespace, table_id, table) in db.tables.items():
+        for (table_namespace, table_id, table) in list(db.tables.items()):
             field = FieldInfo(db, opts, table_namespace, table_id)
             self._filter_table(field, table)
 
@@ -227,8 +227,8 @@ class DecodeCharacters(Filter):
 
     def _filter_table(self, field, table):
         for (row_namespace, row_id, row) in table:
-            for (column, value) in row.items():
-                if isinstance(value, unicode):
+            for (column, value) in list(row.items()):
+                if isinstance(value, str):
                     continue
 
                 field.set_value(row_namespace, column, value)

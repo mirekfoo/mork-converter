@@ -22,7 +22,7 @@ import re
 import warnings
 import os
 try:
-    import cPickle as pickle
+    import pickle as pickle
 except ImportError:
     import pickle
 
@@ -314,9 +314,9 @@ def p_object_id_refscope(p):
 
 def p_error(tok):
     if tok is None:
-        print 'Syntax error at end of input'
+        print('Syntax error at end of input')
     else:
-        print 'Syntax error at token', tok
+        print('Syntax error at token', tok)
         # Try to continue
         yacc.errok()
 
@@ -327,7 +327,7 @@ def parse(data):
 
 def parse_file(f):
     filename = None
-    if isinstance(f, basestring):
+    if isinstance(f, str):
         filename = f
         # Read a cached parse tree if possible
         tree = _get_parse_tree(filename)

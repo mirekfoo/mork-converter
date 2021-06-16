@@ -118,12 +118,19 @@ def t_cell_CARET(t):
     t.lexer.push_state('id')
     return t
 
+    # r'''=  \# XXX I'd like to remove this, but I'm not sure that's allowed.
+    # ( [^)\\]    \# Anything that's not \ or )
+    # | \\[)\\$]  \# Basic escapes
+    # | \\\r?\n   \# Line continuation
+    # | \\\r      \# Line continuation for Macs
+    # )* '''
+
 def t_alias_cell_VALUE(t):
-    r'''=  # XXX I'd like to remove this, but I'm not sure that's allowed.
-    ( [^)\\]    # Anything that's not \ or )
-    | \\[)\\$]  # Basic escapes
-    | \\\r?\n   # Line continuation
-    | \\\r      # Line continuation for Macs
+    r'''=
+    ( [^)\\]
+    | \\[)\\$]
+    | \\\r?\n
+    | \\\r
     )* '''
     newlines = t.value.count('\n')
     if newlines == 0:
@@ -181,14 +188,14 @@ def t_ANY_mac_newline(t):
     t.lexer.lineno += len(t.value)
 
 def t_ANY_error(t):
-    print >> sys.stderr, "Lexing error at line %d, next chars: %r" % (
-        t.lexer.lineno, t.value[:10])
+    print("Lexing error at line %d, next chars: %r" % (
+        t.lexer.lineno, t.value[:10]), file=sys.stderr)
     t.lexer.skip(1)
 
 lex.lex(reflags=re.MULTILINE)
 
 def print_tokens(f):
-    if isinstance(f, basestring):
+    if isinstance(f, str):
         f = open(f)
 
     lex.input(f.read())
@@ -196,4 +203,4 @@ def print_tokens(f):
         tok = lex.token()
         if not tok:
             break
-        print tok
+        print(tok)

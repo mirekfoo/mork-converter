@@ -193,11 +193,11 @@ _conversions = {
 
 def _print_conversions(option, opt_str, value, parser):
     if opt_str == '--show-all-conversions':
-        converters = _converters.items()
+        converters = list(_converters.items())
     else:
         # Generic only.
         converters = [(name, converter)
-                      for (name, converter) in _converters.items()
+                      for (name, converter) in list(_converters.items())
                       if converter.generic]
 
     # Sort generic converters first, then by name.
@@ -205,7 +205,7 @@ def _print_conversions(option, opt_str, value, parser):
 
     name_len = max(len(name) for (name, converter) in converters)
     for (name, converter) in converters:
-        print '%-*s  %s' % (name_len, name, converter.description)
+        print('%-*s  %s' % (name_len, name, converter.description))
 
     sys.exit()
 
@@ -259,12 +259,12 @@ class FieldConverter(Filter):
 
         field = converters.FieldInfo(opts, db)
 
-        for (row_namespace, row_id, row) in db.rows.items():
+        for (row_namespace, row_id, row) in list(db.rows.items()):
             row_conversions = _conversions.get(row_namespace)
             if row_conversions is None:
                 continue
 
-            for (col, value) in row.items():
+            for (col, value) in list(row.items()):
                 # Check user-specified conversions first.
                 conversion = opts.convert.get((row_namespace, col))
                 if conversion is None:
@@ -275,7 +275,7 @@ class FieldConverter(Filter):
                     field.set_value(row_namespace, col, value)
                     try:
                         row[col] = converter.convert(field)
-                    except converters.ConversionError, e:
+                    except converters.ConversionError as e:
                         warnings.warn(
                             'unconvertible value, consider using '
                             '--convert option\n'

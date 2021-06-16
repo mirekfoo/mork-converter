@@ -21,8 +21,8 @@ import sys
 min_python_version = (2, 4)
 if sys.version_info < min_python_version:
     str_version = '.'.join([str(part) for part in min_python_version])
-    print >> sys.stderr, ('This script requires python %s or higher!' %
-                          str_version)
+    print(('This script requires python %s or higher!' %
+                          str_version), file=sys.stderr)
     sys.exit(1)
 
 # Done with version checking. Get on with real work.
@@ -59,7 +59,7 @@ def print_tokens(f):
 def print_syntax_tree(f):
     import MorkDB.morkyacc as morkyacc
     tree = morkyacc.parse_file(f)
-    print tree
+    print(tree)
 
 _leading_space_matcher = re.compile(r'^\s+', re.MULTILINE)
 def _format_docstring(docstring, indent):
@@ -73,10 +73,10 @@ def print_filters():
         else:
             name = filt.__class__.__name__
 
-        print '%5d - %s' % (order, name)
+        print('%5d - %s' % (order, name))
 
         if filt.__doc__:
-            print _format_docstring(filt.__doc__, ' '*10)
+            print(_format_docstring(filt.__doc__, ' '*10))
 
 def process_database(f, filters, opts):
     import MorkDB.morkdb as morkdb
@@ -147,7 +147,7 @@ if __name__ == '__main__':
         sys.exit(main())
     except KeyboardInterrupt:
         sys.exit(1)
-    except IOError, e:
+    except IOError as e:
         import errno
         if e.errno != errno.EPIPE:
             raise

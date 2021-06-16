@@ -34,13 +34,13 @@ class DecodeMimeHeaders(Filter):
         if not opts.mime_headers:
             return
 
-        for (row_namespace, rowid, row) in db.rows.items():
+        for (row_namespace, rowid, row) in list(db.rows.items()):
             headers = self._header_fields.get(row_namespace)
             if headers is None:
                 # This kind of row has no headers to decode.
                 continue
 
-            for (column, value) in row.items():
+            for (column, value) in list(row.items()):
                 if column not in headers:
                     # This is not a decodable header.
                     continue
@@ -88,7 +88,7 @@ class DecodeMimeHeaders(Filter):
             return self._decode_string(charset, encoding.lower(), encoded)
         # There doesn't seem to be a more specific exception that can be used
         # here.
-        except Exception, e:
+        except Exception as e:
             val = m.group()
             warnings.warn('mime_headers decoding failed for %r (%s)' % (val, e))
             return val
